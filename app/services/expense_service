@@ -1,0 +1,29 @@
+from app.schemas.expense import ExpenseCreate, ExpenseResponse
+from fastapi import HTTPException
+from typing import List
+
+class ExpenseService:
+    def __init__(self) -> None:
+        self.expenses = []
+        self.expense_id_counter = 1
+        
+    def add_expense(self, expense:ExpenseCreate) -> ExpenseResponse:
+        global expense_id_counter
+        if expense.number_of_people <= 0 or expense.amount <= 0:
+            raise HTTPException(status_code=400, detail="Amount and number of people must be greater than zero")
+
+        split_amount = round(expense.amount / expense.number_of_people, 2)
+        expense_response = ExpenseResponse(
+            id=self.expense_id_counter,
+            description=expense.description,
+            amount=expense.amount,
+            number_of_people=expense.number_of_people,
+            split_amount=split_amount
+        )
+        self.expenses.append(expense_response)
+        self.expense_id_counter += 1
+        return expense_response
+    
+    def get_expense(self) -> List[ExpenseResponse]:
+        return self.expenses
+        
